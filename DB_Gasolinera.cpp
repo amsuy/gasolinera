@@ -1,4 +1,5 @@
 #include <iostream>
+#include "cConectaDB.h"
 #include "C:/Program Files/MySQL/MySQL Server 8.0/include/mysql.h"	       //Ruta donde se encuenta la bliblioteca mysql.h
 #include "C:/Program Files/MySQL/MySQL Server 8.0/include/mysqld_error.h"  //Ruta donde se encuenta la bliblioteca mysql.h
 #include <stdlib.h>
@@ -6,10 +7,10 @@
 #include <fstream>
 #include <windows.h>
 #include <string>
+#include <iomanip>
 using namespace std;
 
  class data{
- //MYSQL *objDatos;
 public:
 
 //------------------AREA DE ADMINISTRADOR------------------
@@ -35,7 +36,7 @@ void verificadoradministrador() {
         	cout<<"ACCESO DENEGADO"<<endl;
         	system("pause");
         	system("cls");
-        	menu_auxiliar_admin();
+        	//menu_auxiliar_admin();
 		}
 			
 }
@@ -182,7 +183,7 @@ void menuadministrador(){
         } while (true);
 }	
 
-void Ingresa(){
+void Ingresa(MYSQL* objDatos){
 	 	string tipo_gasolina;
 	 	string fecha_ingreso;
 	 	
@@ -190,90 +191,127 @@ void Ingresa(){
 	 	cin>>tipo_gasolina;
 	 	cout<<"ingrese la fecha:\n";
 	 	cin>>fecha_ingreso;
-	 	
-	 		
-		MYSQL* objDatos;
-		objDatos=mysql_init(0);
-		
-		if(mysql_real_connect(objDatos,"127.0.0.1", "root", "Axe$3128", "db_gasolinera", 3306, NULL, 0))
-		{
-			cout<<"\n -----GASOLINERA UMG-----"<<endl;
-			const char* query;
+	
+		const char* query;
 			string sql;
 
 			query=sql.c_str();
 			sql="insert into tipo_gasolina(tipo_gasolina, fecha_ingreso) values('"+tipo_gasolina+"', '"+fecha_ingreso+"');"; 
 			query=sql.c_str();
 			mysql_query(objDatos, query);
-		}
-		else
-		{
-			cout<<"Conexion fallida \n"<<mysql_error(objDatos);
-		}
+}
+
+void Consultar(MYSQL* objDatos){
+		
+		MYSQL_RES *res;
+		MYSQL_ROW row;
+	
+			if (mysql_query(objDatos, "SELECT * FROM db_gasolinera.tipo_gasolina")){
+				cout<<"Error al ejecutar la consulta: " <<mysql_error(objDatos) <<endl;
+				
+			}
+			
+			res =mysql_store_result(objDatos);
+			
+			if(res){
+				cout<<"\t\t\tConsultando Datos"<<endl;
+				cout<< "-----------------------------------------------------------------"<<endl;
+				cout<< left << setw(20) << setfill(' ')<<"Id: ";
+				cout<< left << setw(20) << setfill(' ')<<"Tipo de gasolina: ";
+				cout<< left << setw(20) << setfill(' ')<<"Fecha de ingreso: "<<endl;
+				cout<< "-----------------------------------------------------------------"<<endl;
+				while((row = mysql_fetch_row(res))){
+		
+			cout<< left<< setw(20)<< setfill(' ')<<row[0];	
+			cout<< left<< setw(20)<< setfill(' ')<<row[1];
+			cout<< left<< setw(20)<< setfill(' ')<<row[2]<<endl;   
+			cout<<"-----------------------------------------------------------------";
+			cout<<endl;
+				}
+				mysql_free_result(res);
+			}else{
+				cout<<" Error al obtener el resultado de la consulta: "<< mysql_error(objDatos)<<endl;
+			}
+		system("pause");
+}
+
+void Update(MYSQL* objDatos) {
+    string id_editar;
+    string tipo_gasolina; 
+    string fecha_ingreso;
+
+    cout << "Ingrese el ID a editar:\n";
+    cin >> id_editar;
+
+    cout << "Ingrese el nuevo nombre de Gasolina:\n";
+    cin >> tipo_gasolina;
+    cout << "Ingrese La Nueva Fecha: \n";
+    cin >> fecha_ingreso;
+
+string sql = "UPDATE db_gasolinera.tipo_gasolina SET tipo_gasolina = '" + tipo_gasolina + "', fecha_ingreso = '" + fecha_ingreso + "' WHERE idtipo_gasolina = '" + id_editar + "';";
+
+        const char* query = sql.c_str();
+        if (mysql_query(objDatos, query) == 0) {
+            cout << "Registro actualizado exitosamente.\n";
+        } else {
+            cout << "Error al actualizar el registro: " << mysql_error(objDatos) << endl;
+        }
+
+    mysql_close(objDatos);
 }
 
 
-void Borrar(){
+void Borrar(MYSQL* objDatos){
 	 	string id_borrar;
 	 	
 	 	cout<<"ingrese el ID a borrar:\n";
 	 	cin>>id_borrar;
-	 	
-		MYSQL* objDatos;
-		objDatos=mysql_init(0);
-		
-		if(mysql_real_connect(objDatos,"127.0.0.1", "root", "Axe$3128", "db_gasolinera", 3306, NULL, 0))
-		{
-			cout<<"\n -----GASOLINERA UMG-----"<<endl;
-			const char* query;
+
+		const char* query;
 			string sql;
 
 			query=sql.c_str();
 			sql="delete from  tipo_gasolina where idtipo_gasolina = '"+id_borrar+"';"; 
 			query=sql.c_str();
 			mysql_query(objDatos, query);
-		}
-		else
-		{
-			cout<<"Conexion fallida \n"<<mysql_error(objDatos);
-		}
 }
-void Consultar(){
-		MYSQL* objDatos;
-		MYSQL_RES *res;
-		MYSQL_ROW row;
-		objDatos=mysql_init(0);
-		if(mysql_real_connect(objDatos,"127.0.0.1", "root", "Axe$3128", "db_gasolinera", 3306, NULL, 0))
-		{
-			if (mysql_query(objDatos, "SELECT * FROM tipo_gasolina")){
-				cout<<"Error al ejecutar la consulta: " <<mysql_error(objDatos) <<endl;
 
-			}
-			
-			res =mysql_store_result(objDatos);
-			
-			if(res){
-				cout<<"Consultando Datos"<<endl;
-				
-				while((row = mysql_fetch_row(res))){
-					cout<<"Id: "<< row[0]<<endl;
-					cout<<"Tipo de gasolina: "<< row[1]<<endl;
-					cout<<"Fecha de ingreso: "<< row[2]<<endl;
-					cout<<endl<<endl;
-				}
-				mysql_free_result(res);
-			}else{
-				cout<<" Error al obtener el resultado de la consulta: "<< mysql_error(objDatos)<<endl;
-			}
+void Datomenu(MYSQL* objDatos){
+	do{
+		int opc;
+		system("cls");
+		cout<<"1) Ingresar Datos\n";
+		cout<<"2) Consultar Datos\n";
+		cout<<"3) Actualizar Datos\n";
+		cout<<"4) Borrar Datos\n";
+		cout<<"5) Salir\n";
+		cout<<"Ingresa la opcion a Realizar"<<endl;
+		cin>>opc;
+		switch(opc){
+			case 1:
+				system("cls");
+				Ingresa(objDatos);
+				break;
+			case 2:
+				system("cls");
+				Consultar(objDatos);
+				break;
+			case 3:
+				system("cls");
+				Update(objDatos);
+				break;
+			case 4:
+				system("cls");
+				Borrar(objDatos);
+				break;
+			case 5:
+				return;
 		}
-		else
-		{
-			cout<<"Conexion fallida \n"<<mysql_error(objDatos);
-		}
-		system("pause");
+	}while(true);
 }
+
 //void de contedor de unidad de medida
-void Ingresacontenedor(){
+void Ingresacontenedor(MYSQL* objDatos){
 	 	string cantidad_super;
 	 	string cantidad_regular;
 	 	string cantidad_disel;
@@ -288,147 +326,135 @@ void Ingresacontenedor(){
 	 	cout<<"ingrese la fecha:\n";
 	 	cin>>fecha_ingreso;
 	 	
-	 		
-		MYSQL* objDatos;
-		objDatos=mysql_init(0);
-		
-		if(mysql_real_connect(objDatos,"127.0.0.1", "root", "Axe$3128", "db_gasolinera", 3306, NULL, 0))
-		{
-			cout<<"\n -----GASOLINERA UMG-----"<<endl;
-			const char* query;
+		const char* query;
 			string sql;
 
 			query=sql.c_str();
 			sql="insert into contenedor_unidad(contenedor_super, contenedor_regular, contenedor_disel, fecha_ingreso) values('"+cantidad_super+"', '"+cantidad_regular+"', '"+cantidad_disel+"', '"+fecha_ingreso+"');"; 
 			query=sql.c_str();
 			mysql_query(objDatos, query);
-		}
-		else
-		{
-			cout<<"Conexion fallida \n"<<mysql_error(objDatos);
-		}
+			
 }
 
-void Borrarcontenedor(){
+void Consultarcontenedor(MYSQL* objDatos){
+
+		MYSQL_RES *res;
+		MYSQL_ROW row;
+	
+			if (mysql_query(objDatos, "SELECT * FROM db_gasolinera.contenedor_unidad")){
+				cout<<"Error al ejecutar la consulta: " <<mysql_error(objDatos) <<endl;
+			
+			}
+			res =mysql_store_result(objDatos);
+			if(res){
+				cout<<"\t\t\tConsultando Datos"<<endl;
+					cout<< "---------------------------------------------------------------------------------------"<<endl;
+				cout<< left << setw(5) << setfill(' ')<<"Id: ";
+				cout<< left << setw(20) << setfill(' ')<<"Unidad M. Super: ";
+				cout<< left << setw(20) << setfill(' ')<<"Unidad M. Regular: ";
+				cout<< left << setw(20) << setfill(' ')<<"Unidad M. Disel: ";
+				cout<< left << setw(20) << setfill(' ')<<"Fecha de ingreso: "<<endl;
+					cout<<"---------------------------------------------------------------------------------------"<<endl;
+						
+				while((row = mysql_fetch_row(res))){
+				
+					cout<< left<< setw(5)<< setfill(' ')<<row[0];	
+					cout<< left<< setw(20)<< setfill(' ')<<row[1];
+					cout<< left<< setw(20)<< setfill(' ')<<row[2];
+					cout<< left<< setw(20)<< setfill(' ')<<row[3];
+					cout<< left<< setw(20)<< setfill(' ')<<row[4]<<endl;
+					cout<<"---------------------------------------------------------------------------------------";
+					cout<<endl;
+				}
+				mysql_free_result(res);
+			}else{
+				cout<<" Error al obtener el resultado de la consulta: "<< mysql_error(objDatos)<<endl;
+			}
+	system("pause");
+}
+
+void Updatecontenedor(MYSQL* objDatos) {
+    string id_editar;
+    string cantidad_super; 
+    string cantidad_regular;
+    string cantidad_disel;
+    string fecha_ingreso;
+
+    cout << "Ingrese el ID a editar:\n";
+    cin >> id_editar;
+
+    cout << "Ingrese el nueva Cantidad super:\n";
+    cin >> cantidad_super;
+    cout << "Ingrese el nueva cantidad regular:\n";
+    cin >> cantidad_regular;
+    cout << "Ingrese el nueva cantidad disel:\n";
+    cin >> cantidad_disel;
+    cout << "Ingrese La Nueva Fecha: \n";
+    cin >> fecha_ingreso;
+
+string sql = "UPDATE contenedor_unidad SET contenedor_super = '" + cantidad_super + "', contenedor_regular = '" + cantidad_regular + "', contenedor_disel = '" + cantidad_disel + "', fecha_ingreso = '" + fecha_ingreso + "' WHERE idcontenedor_unidad = '" + id_editar + "';";
+
+        const char* query = sql.c_str();
+        if (mysql_query(objDatos, query) == 0) {
+            cout << "Registro actualizado exitosamente.\n";
+        } else {
+            cout << "Error al actualizar el registro: " << mysql_error(objDatos) << endl;
+        }
+
+    mysql_close(objDatos);
+}
+
+void Borrarcontenedor(MYSQL* objDatos){
 	 	string id_borrar;
 	 	
 	 	cout<<"ingrese el ID a borrar:\n";
 	 	cin>>id_borrar;
-	 	
-		MYSQL* objDatos;
-		objDatos=mysql_init(0);
-		
-		if(mysql_real_connect(objDatos,"127.0.0.1", "root", "Axe$3128", "db_gasolinera", 3306, NULL, 0))
-		{
-			cout<<"\n -----GASOLINERA UMG-----"<<endl;
-			const char* query;
+
+		const char* query;
 			string sql;
 
 			query=sql.c_str();
 			sql="delete from  contenedor_unidad where idcontenedor_unidad = '"+id_borrar+"';"; 
 			query=sql.c_str();
 			mysql_query(objDatos, query);
-		}
-		else
-		{
-			cout<<"Conexion fallida \n"<<mysql_error(objDatos);
-		}
+			
 }
-void Consultarcontenedor(){
-		MYSQL* objDatos;
-		MYSQL_RES *res;
-		MYSQL_ROW row;
-		objDatos=mysql_init(0);
-		if(mysql_real_connect(objDatos,"127.0.0.1", "root", "Axe$3128", "db_gasolinera", 3306, NULL, 0))
-		{
-			if (mysql_query(objDatos, "SELECT * FROM contenedor_unidad")){
-				cout<<"Error al ejecutar la consulta: " <<mysql_error(objDatos) <<endl;
 
-			}
-			
-			res =mysql_store_result(objDatos);
-			
-			if(res){
-				cout<<"Consultando Datos"<<endl;
-				
-				while((row = mysql_fetch_row(res))){
-					cout<<"Id: "<< row[0]<<endl;
-					cout<<"Cantidad de contenedor Super: "<< row[1]<<endl;
-					cout<<"Cantidad de contenedor Regular: "<< row[2]<<endl;
-					cout<<"Cantidad de contenedor Disel: "<< row[3]<<endl;
-					cout<<"Fecha de ingreso: "<< row[4]<<endl;
-					cout<<endl<<endl;
-				}
-				mysql_free_result(res);
-			}else{
-				cout<<" Error al obtener el resultado de la consulta: "<< mysql_error(objDatos)<<endl;
-			}
-		}
-		else
-		{
-			cout<<"Conexion fallida \n"<<mysql_error(objDatos);
-		}
-		system("pause");
-}
-void Datomenu(){
+void Contenedor(MYSQL* objDatos){
 	do{
 		int opc;
 		system("cls");
 		cout<<"1) Ingresar Datos\n";
 		cout<<"2) Consultar Datos\n";
-		cout<<"3) Borrar Datos\n";
-		cout<<"4) Salir\n";
+		cout<<"3) Actualizar Datos\n";
+		cout<<"4) Borrar Datos\n";
+		cout<<"5) Salir\n";
 		cout<<"Ingresa la opcion a Realizar"<<endl;
 		cin>>opc;
 		switch(opc){
 			case 1:
 				system("cls");
-				Ingresa();
+				Ingresacontenedor(objDatos);
 				break;
 			case 2:
 				system("cls");
-				Consultar();
+				Consultarcontenedor(objDatos);
 				break;
 			case 3:
 				system("cls");
-				Borrar();
+				Updatecontenedor(objDatos);
 				break;
 			case 4:
-				return;
-		}
-	}while(true);
-}	
-
-void Contenedor(){
-	do{
-		int opc;
-		system("cls");
-		cout<<"1) Ingresar Datos\n";
-		cout<<"2) Consultar Datos\n";
-		cout<<"3) Borrar Datos\n";
-		cout<<"4) Salir\n";
-		cout<<"Ingresa la opcion a Realizar"<<endl;
-		cin>>opc;
-		switch(opc){
-			case 1:
 				system("cls");
-				Ingresacontenedor();
+				Borrarcontenedor(objDatos);
 				break;
-			case 2:
-				system("cls");
-				Consultarcontenedor();
-				break;
-			case 3:
-				system("cls");
-				Borrarcontenedor();
-				break;
-			case 4:
+			case 5:
 				return;
 		}
 	}while(true);
 }
 
-void ReporteDato(){
+void ReporteDato(MYSQL* objDatos){
 	do{
 		int opc;
 		system("cls");
@@ -442,19 +468,19 @@ void ReporteDato(){
 		cin>>opc;
 		switch(opc){
 			case 1:
-				Datomenu();
+				Datomenu(objDatos);
 				break;
 			case 2:
-				Datomenu();
+				Datomenu(objDatos);
 				break;
 			case 3:
-				Datomenu();
+				Datomenu(objDatos);
 				break;
 			case 4:
-				Datomenu();
+				Datomenu(objDatos);
 				break;
 			case 5:
-				Datomenu();
+				Datomenu(objDatos);
 				break;
 			case 6:
 				return;
@@ -531,7 +557,7 @@ if(!(objDatos = mysql_init(0))) {
         case 6:
           iniciar_sesion_abas();
           cout << "" << endl;
-          menu_area_abastecimiento();
+          menu_area_abastecimiento(objDatos);
 	      break;	
         //----------------------
         case 7:
@@ -555,7 +581,7 @@ if(!(objDatos = mysql_init(0))) {
     } while (true);		
 }	
 	
-		
+	
 	
 //--------------------------AREA DE CONSULTAS--------------------------
 
@@ -618,7 +644,7 @@ if(!(objDatos = mysql_init(0))) {
         cout << "\nNombre de usuario o contrase?a incorrectos." << endl;
         system("pause");
         system("cls");
-        menu_auxiliar_admin();
+      //  menu_auxiliar_admin();
     }
     }
 
@@ -738,7 +764,7 @@ void menu_area_mantenimineto(){
         cout << "\nNombre de usuario o contrase?a incorrectos." << endl;
         system("pause");
         system("cls");
-        menu_auxiliar_admin();
+        //menu_auxiliar_admin();
     }
     }
 
@@ -851,7 +877,7 @@ void iniciar_sesion_pedido() {
         cout << "\nNombre de usuario o contrase?a incorrectos." << endl;
         system("pause");
         system("cls");
-        menu_auxiliar_admin();
+       // menu_auxiliar_admin();
     }
 }
 
@@ -964,7 +990,7 @@ void menu_area_ventas(){
         cout << "\nNombre de usuario o contrase?a incorrectos." << endl;
         system("pause");
         system("cls");
-        menu_auxiliar_admin();
+      //  menu_auxiliar_admin();
     }
 }
 
@@ -1013,7 +1039,7 @@ void consultar_usuarios_area_ventas(){
 //-------------------------AREA DE ABASTECIMIENTO-------------------------
 
 // menu de area de abastecimiento
-void menu_area_abastecimiento(){
+void menu_area_abastecimiento(MYSQL* objDatos){
 	int opcion;
 	do{
 		system("cls");
@@ -1030,25 +1056,25 @@ void menu_area_abastecimiento(){
 		cin>>opcion;
 		switch(opcion){
 			case 1:
-				Datomenu();
+				Datomenu(objDatos);
 				break;
 			case 2:
-				Contenedor();
+				Contenedor(objDatos);
 				break;
 			case 3:
-				Datomenu();
+				Datomenu(objDatos);
 				break;
 			case 4:
-				Datomenu();
+				Datomenu(objDatos);
 				break;
 			case 5:
-				Datomenu();
+				Datomenu(objDatos);
 				break;
 			case 6:
-				Datomenu();
+				Datomenu(objDatos);
 				break;
 			case 7:
-				ReporteDato();
+				ReporteDato(objDatos);
 				break;
 			case 8:
 				return;
@@ -1115,7 +1141,7 @@ void iniciar_sesion_abas() {
         cout << "\nNombre de usuario o contrase?a incorrectos." << endl;
         system("pause");
         system("cls");
-        menu_auxiliar_admin();
+     //   menu_auxiliar_admin();
     }
 }
 
@@ -1167,28 +1193,18 @@ void consultar_usuarios_area_abas(){
 int main() {
 	
 data base;
+MYSQL *objDatos;
+cConectaDB conn;
 char continuar = 's';
 
-do {
-	MYSQL *objDatos;
-	setlocale(LC_ALL, "");
-// Intentar iniciar MySQL:
-  if(!(objDatos = mysql_init(0))) {
-      // Imposible crear el objeto objDatos
-      cout << "ERROR: imposible crear el objeto objDatos." << endl;          
+if(!(objDatos = mysql_init(0))) {
+    // Imposible crear el objeto objDatos
+      std::cout << "ERROR: imposible crear el objeto objDatos.\n";          
       return 1;
-
-};
-  
- if(mysql_real_connect(objDatos,"127.0.0.1", "root", "Axe$3128", "db_gasolinera", 3306, NULL, 0))
- {
- 	cout<<"\n ----- GASOLINERA -----"<<endl;
-	
- }
- else
- {
- 	cout<<"Conexion fallida \n"<<mysql_error(objDatos);
- }
+    }
+   //Creando objetos
+	conn.conecta_base_datos(objDatos);
+do {
  
         int opcion;
         cout<<"***Bienvenidos***"<< endl;
@@ -1236,7 +1252,7 @@ do {
         case 6:
           base.iniciar_sesion_abas();
           cout << "" << endl;
-          base.menu_area_abastecimiento();
+          base.menu_area_abastecimiento(objDatos);
 	      break;	
         //----------------------
         case 7:
