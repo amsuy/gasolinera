@@ -188,9 +188,10 @@ void Ingresa(MYSQL* objDatos){
 	 	string fecha_ingreso;
 	 	
 	 	cout<<"ingrese el tipo de Gasolina:\n";
-	 	cin>>tipo_gasolina;
+	 	cin.ignore();
+	 	getline(cin, tipo_gasolina);
 	 	cout<<"ingrese la fecha:\n";
-	 	cin>>fecha_ingreso;
+	 	getline(cin, fecha_ingreso);
 	
 		const char* query;
 			string sql;
@@ -206,14 +207,13 @@ void Consultar(MYSQL* objDatos){
 		MYSQL_RES *res;
 		MYSQL_ROW row;
 	
-			if (mysql_query(objDatos, "SELECT * FROM db_gasolinera.tipo_gasolina")){
+			if (mysql_query(objDatos, "SELECT * FROM tipo_gasolina")){
 				cout<<"Error al ejecutar la consulta: " <<mysql_error(objDatos) <<endl;
 				
 			}
 			
 			res =mysql_store_result(objDatos);
 			
-			if(res){
 				cout<<"\t\t\tConsultando Datos"<<endl;
 				cout<< "-----------------------------------------------------------------"<<endl;
 				cout<< left << setw(20) << setfill(' ')<<"Id: ";
@@ -229,9 +229,7 @@ void Consultar(MYSQL* objDatos){
 			cout<<endl;
 				}
 				mysql_free_result(res);
-			}else{
-				cout<<" Error al obtener el resultado de la consulta: "<< mysql_error(objDatos)<<endl;
-			}
+	
 		system("pause");
 }
 
@@ -242,13 +240,13 @@ void Update(MYSQL* objDatos) {
 
     cout << "Ingrese el ID a editar:\n";
     cin >> id_editar;
-
+	cin.ignore();
     cout << "Ingrese el nuevo nombre de Gasolina:\n";
     cin >> tipo_gasolina;
     cout << "Ingrese La Nueva Fecha: \n";
     cin >> fecha_ingreso;
 
-string sql = "UPDATE db_gasolinera.tipo_gasolina SET tipo_gasolina = '" + tipo_gasolina + "', fecha_ingreso = '" + fecha_ingreso + "' WHERE idtipo_gasolina = '" + id_editar + "';";
+string sql = "UPDATE tipo_gasolina SET tipo_gasolina = '" + tipo_gasolina + "', fecha_ingreso = '" + fecha_ingreso + "' WHERE idtipo_gasolina = '" + id_editar + "';";
 
         const char* query = sql.c_str();
         if (mysql_query(objDatos, query) == 0) {
@@ -257,7 +255,7 @@ string sql = "UPDATE db_gasolinera.tipo_gasolina SET tipo_gasolina = '" + tipo_g
             cout << "Error al actualizar el registro: " << mysql_error(objDatos) << endl;
         }
 
-    mysql_close(objDatos);
+   // mysql_close(objDatos);
 }
 
 
@@ -280,13 +278,20 @@ void Datomenu(MYSQL* objDatos){
 	do{
 		int opc;
 		system("cls");
-		cout<<"1) Ingresar Datos\n";
-		cout<<"2) Consultar Datos\n";
-		cout<<"3) Actualizar Datos\n";
-		cout<<"4) Borrar Datos\n";
-		cout<<"5) Salir\n";
-		cout<<"Ingresa la opcion a Realizar"<<endl;
-		cin>>opc;
+			cout<<"*****************************************\n";
+			cout<<"|  1) Ingresar Datos                    |\n"; 
+			cout<<"-----------------------------------------\n";         
+			cout<<"|  2) Consultar Datos                   |\n";
+			cout<<"-----------------------------------------\n";
+			cout<<"|  3) Actualizar Datos                  |\n";
+			cout<<"-----------------------------------------\n";
+			cout<<"|  4) Borrar Datos                      |\n";
+			cout<<"-----------------------------------------\n";
+			cout<<"|  5) Salir                             |\n";
+			cout<<"-----------------------------------------\n";
+			cout<<"Ingresa la opcion a Realizar: ";
+			cin>>opc;
+	
 		switch(opc){
 			case 1:
 				system("cls");
@@ -318,13 +323,13 @@ void Ingresacontenedor(MYSQL* objDatos){
 	 	string fecha_ingreso;
 	 	
 	 	cout<<"ingrese Cantidad de contenedor de super:\n";
-	 	cin>>cantidad_super;
+	 	getline(cin, cantidad_super);
 	 	cout<<"ingrese Cantidad de contenedor de regulado:\n";
-	 	cin>>cantidad_regular;
+	 	getline(cin, cantidad_regular);
 	 	cout<<"ingrese Cantidad de contenedor de disel:\n";
-	 	cin>>cantidad_disel;
+	 	getline(cin, cantidad_disel);
 	 	cout<<"ingrese la fecha:\n";
-	 	cin>>fecha_ingreso;
+	 	getline(cin, fecha_ingreso);
 	 	
 		const char* query;
 			string sql;
@@ -346,10 +351,10 @@ void Consultarcontenedor(MYSQL* objDatos){
 			
 			}
 			res =mysql_store_result(objDatos);
-			if(res){
+			
 				cout<<"\t\t\tConsultando Datos"<<endl;
 					cout<< "---------------------------------------------------------------------------------------"<<endl;
-				cout<< left << setw(5) << setfill(' ')<<"Id: ";
+				cout<< left << setw(20) << setfill(' ')<<"Id: ";
 				cout<< left << setw(20) << setfill(' ')<<"Unidad M. Super: ";
 				cout<< left << setw(20) << setfill(' ')<<"Unidad M. Regular: ";
 				cout<< left << setw(20) << setfill(' ')<<"Unidad M. Disel: ";
@@ -358,7 +363,7 @@ void Consultarcontenedor(MYSQL* objDatos){
 						
 				while((row = mysql_fetch_row(res))){
 				
-					cout<< left<< setw(5)<< setfill(' ')<<row[0];	
+					cout<< left<< setw(20)<< setfill(' ')<<row[0];	
 					cout<< left<< setw(20)<< setfill(' ')<<row[1];
 					cout<< left<< setw(20)<< setfill(' ')<<row[2];
 					cout<< left<< setw(20)<< setfill(' ')<<row[3];
@@ -367,9 +372,7 @@ void Consultarcontenedor(MYSQL* objDatos){
 					cout<<endl;
 				}
 				mysql_free_result(res);
-			}else{
-				cout<<" Error al obtener el resultado de la consulta: "<< mysql_error(objDatos)<<endl;
-			}
+		
 	system("pause");
 }
 
@@ -384,13 +387,13 @@ void Updatecontenedor(MYSQL* objDatos) {
     cin >> id_editar;
 
     cout << "Ingrese el nueva Cantidad super:\n";
-    cin >> cantidad_super;
+    getline(cin, cantidad_super);
     cout << "Ingrese el nueva cantidad regular:\n";
-    cin >> cantidad_regular;
+    getline(cin, cantidad_regular);
     cout << "Ingrese el nueva cantidad disel:\n";
-    cin >> cantidad_disel;
+    getline(cin, cantidad_disel);
     cout << "Ingrese La Nueva Fecha: \n";
-    cin >> fecha_ingreso;
+    getline(cin, fecha_ingreso);
 
 string sql = "UPDATE contenedor_unidad SET contenedor_super = '" + cantidad_super + "', contenedor_regular = '" + cantidad_regular + "', contenedor_disel = '" + cantidad_disel + "', fecha_ingreso = '" + fecha_ingreso + "' WHERE idcontenedor_unidad = '" + id_editar + "';";
 
@@ -401,7 +404,6 @@ string sql = "UPDATE contenedor_unidad SET contenedor_super = '" + cantidad_supe
             cout << "Error al actualizar el registro: " << mysql_error(objDatos) << endl;
         }
 
-    mysql_close(objDatos);
 }
 
 void Borrarcontenedor(MYSQL* objDatos){
@@ -424,12 +426,18 @@ void Contenedor(MYSQL* objDatos){
 	do{
 		int opc;
 		system("cls");
-		cout<<"1) Ingresar Datos\n";
-		cout<<"2) Consultar Datos\n";
-		cout<<"3) Actualizar Datos\n";
-		cout<<"4) Borrar Datos\n";
-		cout<<"5) Salir\n";
-		cout<<"Ingresa la opcion a Realizar"<<endl;
+		cout<<"*****************************************\n";
+		cout<<"|  1) Ingresar Datos                    |\n";
+		cout<<"-----------------------------------------\n";
+		cout<<"|  2) Consultar Datos                   |\n";
+		cout<<"-----------------------------------------\n";
+		cout<<"|  3) Actualizar Datos                  |\n";
+		cout<<"-----------------------------------------\n";
+		cout<<"|  4) Borrar Datos                      |\n";
+		cout<<"-----------------------------------------\n";
+		cout<<"|  5) Salir                             |\n";
+		cout<<"-----------------------------------------\n";
+		cout<<"Ingresa la opcion a Realizar: ";
 		cin>>opc;
 		switch(opc){
 			case 1:
@@ -458,13 +466,24 @@ void ReporteDato(MYSQL* objDatos){
 	do{
 		int opc;
 		system("cls");
-		cout<<"1) Existencia de Combustible ID\n";
-		cout<<"2) Pedido y Ventas ID\n";
-		cout<<"3) Kardex (Filtro por fecha  y ID combustible)\n";
-		cout<<"4) Suministro y Distribuciion en Contenedores\n";
-		cout<<"5) Filtrar por ID de contenedor y Rango de fechas\n";
-		cout<<"6) Salir\n";
-		cout<<"Ingrese la opcion a Realizar"<<endl;
+		cout<<"*******************************************************\n";
+		cout<<"*                                                     *\n";
+		cout<<"*              MENU REPORTE                           *\n";
+		cout<<"*                                                     *\n";
+		cout<<"*******************************************************\n";
+		cout<<"*  1) Existencia de Combustible ID                    *\n";
+		cout<<"-------------------------------------------------------\n";
+		cout<<"*  2) Pedido y Ventas ID                              *\n";
+		cout<<"-------------------------------------------------------\n";
+		cout<<"*  3) Kardex (Filtro por fecha  y ID combustible)     *\n";
+		cout<<"-------------------------------------------------------\n";
+		cout<<"*  4) Suministro y Distribuciion en Contenedores      *\n";
+		cout<<"-------------------------------------------------------\n";
+		cout<<"*  5) Filtrar por ID de contenedor y Rango de fechas  *\n";
+		cout<<"-------------------------------------------------------\n";
+		cout<<"*  6) Salir                                           *\n";
+		cout<<"*******************************************************\n";
+		cout<<"Ingrese la opcion a Realizar: ";
 		cin>>opc;
 		switch(opc){
 			case 1:
@@ -503,7 +522,7 @@ if(!(objDatos = mysql_init(0))) {
   
  if(mysql_real_connect(objDatos,"127.0.0.1", "root", "Axe$3128", "db_gasolinera", 3306, NULL, 0))
  {
- 	cout<<"\n -----GASOLINERA UMG-----"<<endl;
+ //f	cout<<"\n -----GASOLINERA UMG-----"<<endl;
 	
  }
  else
@@ -644,7 +663,7 @@ if(!(objDatos = mysql_init(0))) {
         cout << "\nNombre de usuario o contrase?a incorrectos." << endl;
         system("pause");
         system("cls");
-      //  menu_auxiliar_admin();
+        menu_auxiliar_admin();
     }
     }
 
@@ -764,7 +783,7 @@ void menu_area_mantenimineto(){
         cout << "\nNombre de usuario o contrase?a incorrectos." << endl;
         system("pause");
         system("cls");
-        //menu_auxiliar_admin();
+        menu_auxiliar_admin();
     }
     }
 
@@ -877,7 +896,7 @@ void iniciar_sesion_pedido() {
         cout << "\nNombre de usuario o contrase?a incorrectos." << endl;
         system("pause");
         system("cls");
-       // menu_auxiliar_admin();
+        menu_auxiliar_admin();
     }
 }
 
@@ -990,7 +1009,7 @@ void menu_area_ventas(){
         cout << "\nNombre de usuario o contrase?a incorrectos." << endl;
         system("pause");
         system("cls");
-      //  menu_auxiliar_admin();
+        menu_auxiliar_admin();
     }
 }
 
@@ -1043,16 +1062,27 @@ void menu_area_abastecimiento(MYSQL* objDatos){
 	int opcion;
 	do{
 		system("cls");
-		cout<<"\n MENU ABASTECIMIENTO"<<endl;
-		cout<<" 1) Tipo de Combustible\n";
-		cout<<" 2) Contenedores, Unidades de Medida\n";
-		cout<<" 3) ID Cliente\n";
-		cout<<" 4) ID Proveedores\n";
-		cout<<" 5) Pedidos y ventas\n";
-		cout<<" 6) Suministro y Distribucione en contenedores (Kardex)\n";
-		cout<<" 7) REPORTES\n";
-		cout<<" 8) Salir"<<endl;
-		cout<<"Ingrese la opcion a realizar"<<endl;
+		cout<<"_______________________________________________________________\n";
+		cout<<"|                                                             |\n";
+		cout<<"|                    MENU ABASTECIMIENTO                      |\n";
+		cout<<"|_____________________________________________________________|\n";
+		cout<<"|   1) Tipo de Combustible                                    |\n";
+		cout<<"|-------------------------------------------------------------|\n";
+		cout<<"|   2) Contenedores, Unidades de Medida                       |\n";
+		cout<<"|-------------------------------------------------------------|\n";
+		cout<<"|   3) ID Cliente                                             |\n";
+		cout<<"|-------------------------------------------------------------|\n";
+		cout<<"|   4) ID Proveedores                                         |\n";
+		cout<<"|-------------------------------------------------------------|\n";
+		cout<<"|   5) Pedidos y ventas                                       |\n";
+		cout<<"|-------------------------------------------------------------|\n";
+		cout<<"|   6) Suministro y Distribucione en contenedores (Kardex)    |\n";
+		cout<<"|-------------------------------------------------------------|\n";
+		cout<<"|   7) REPORTES                                               |\n";
+		cout<<"|-------------------------------------------------------------|\n";
+		cout<<"|   8) Salir                                                  |\n";
+		cout<<"|-------------------------------------------------------------|\n";
+		cout<<"Ingrese la opcion a realizar ";
 		cin>>opcion;
 		switch(opcion){
 			case 1:
@@ -1141,7 +1171,7 @@ void iniciar_sesion_abas() {
         cout << "\nNombre de usuario o contrase?a incorrectos." << endl;
         system("pause");
         system("cls");
-     //   menu_auxiliar_admin();
+        menu_auxiliar_admin();
     }
 }
 
